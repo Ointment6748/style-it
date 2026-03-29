@@ -1,0 +1,26 @@
+{
+  "name": "style-it",
+  "version": "1.0.0",
+  "description": "A digital wardrobe app — upload clothing photos, remove backgrounds in-browser, and build layered outfits.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ointment6748/style-it/issues"
+  },
+  "homepage": "https://github.com/Ointment6748/style-it#readme",
+  "devDependencies": {
+    "vite": "^8.0.2"
+  },
+  "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
+    "@supabase/supabase-js": "^2.100.1"
+  }
+}
