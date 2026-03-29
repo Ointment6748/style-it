@@ -6,6 +6,7 @@ const AppRouter = (() => {
   let currentView = 'wardrobe';
   let allWardrobeItems = [];
   let currentCategory = 'all';
+  let currentColor = null;
 
   // ── Carousel state ───────────────────────────────────────────
   const CAROUSEL_CATS = ['outerwear', 'top', 'bottom', 'shoes', 'accessory', 'other'];
@@ -49,16 +50,51 @@ const AppRouter = (() => {
 
   // ── Wardrobe View ────────────────────────────────────────────
   async function loadWardrobe(category = currentCategory) {
+    if (category !== currentCategory) currentColor = null; // reset color when changing cat
     currentCategory = category;
     showSpinner('wardrobe-spinner');
     try {
       allWardrobeItems = await WardrobeModule.fetchItems(category === 'all' ? null : category);
-      renderWardrobeGrid(allWardrobeItems);
+      
+      renderColorPanel(allWardrobeItems);
+      
+      const filtered = currentColor ? allWardrobeItems.filter(i => i.color && i.color.toLowerCase() === currentColor.toLowerCase()) : allWardrobeItems;
+      renderWardrobeGrid(filtered);
     } catch (e) {
       showError('wardrobe-error', e.message);
     } finally {
       hideSpinner('wardrobe-spinner');
     }
+  }
+
+  function renderColorPanel(items) {
+    const panel = document.getElementById('wardrobe-color-panel');
+    if (!panel) return;
+    const colors = new Set();
+    items.forEach(i => {
+       if (i.color) colors.add(i.color.trim().toLowerCase());
+    });
+    
+    panel.innerHTML = '';
+    if (colors.size === 0) {
+      panel.style.display = 'none';
+      return;
+    }
+    panel.style.display = 'flex';
+
+    colors.forEach(col => {
+      const btn = document.createElement('button');
+      btn.className = 'cat-btn'; // use the same style as category buttons
+      if (currentColor === col) btn.classList.add('active');
+      btn.textContent = col.charAt(0).toUpperCase() + col.slice(1);
+      btn.onclick = () => {
+        currentColor = currentColor === col ? null : col;
+        const filtered = currentColor ? allWardrobeItems.filter(i => i.color && i.color.toLowerCase() === currentColor.toLowerCase()) : allWardrobeItems;
+        renderWardrobeGrid(filtered);
+        renderColorPanel(allWardrobeItems); // update active state
+      };
+      panel.appendChild(btn);
+    });
   }
 
   function renderWardrobeGrid(items) {
@@ -82,6 +118,8 @@ const AppRouter = (() => {
         <div class="item-info">
           <span class="item-name">${item.name}</span>
           <span class="item-cat badge">${item.category}</span>
+          ${item.color ? `<span class="item-cat badge" style="background:var(--bg-2);color:var(--text-1)">${item.color}</span>` : ''}
+          ${item.style ? `<span class="item-cat badge" style="background:var(--bg-2);color:var(--text-1)">${item.style}</span>` : ''}
         </div>`;
       grid.appendChild(card);
     });
@@ -162,6 +200,8 @@ const AppRouter = (() => {
       const file     = fileInput.files[0];
       const name     = document.getElementById('item-name').value.trim();
       const category = document.getElementById('item-category').value;
+      const color    = document.getElementById('item-color').value.trim() || null;
+      const style    = document.getElementById('item-style').value || null;
       const bgMode   = document.querySelector('input[name="bg-mode"]:checked').value;
       if (!file || !name) return;
 
@@ -208,7 +248,7 @@ const AppRouter = (() => {
         progressText.textContent = 'Uploading…';
         progressBar.style.width  = '88%';
 
-        await WardrobeModule.uploadProcessedBlob(finalBlob, name, category);
+        await WardrobeModule.uploadProcessedBlob(finalBlob, name, category, color, style);
 
         progressBar.style.width  = '100%';
         progressText.textContent = 'Done!';
@@ -226,9 +266,9 @@ const AppRouter = (() => {
 
   // ── Category filter ───────────────────────────────────────────
   function initCategoryFilter() {
-    document.querySelectorAll('.cat-btn').forEach(btn => {
+    document.querySelectorAll('.category-filter .cat-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.category-filter .cat-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         loadWardrobe(btn.dataset.cat);
       });
@@ -311,7 +351,10 @@ const AppRouter = (() => {
 
   function initClearCanvas() {
     document.getElementById('btn-clear-canvas').addEventListener('click', () => {
-      if (confirm('Clear all layers?')) OutfitBuilder.clearCanvas();
+      if (confirm('Clear all layers?')) {
+        OutfitBuilder.clearCanvas();
+        document.getElementById('outfit-name-input').value = '';
+      }
     });
   }
 
@@ -378,12 +421,14 @@ const AppRouter = (() => {
       if (state.index >= 0 && state.items[state.index]) {
         hasItems = true;
         const item = state.items[state.index];
+        const win = document.createElement('div');
+        win.className = 'layer-window glass';
         const img = document.createElement('img');
         img.src = item.image_url;
         img.alt = item.name;
-        img.style.zIndex = i + 1;
         img.style.transform = `scale(${state.scale})`;
-        preview.appendChild(img);
+        win.appendChild(img);
+        preview.appendChild(win);
       }
     });
     document.getElementById('carousel-preview-empty').style.display = hasItems ? 'none' : 'flex';
@@ -437,7 +482,11 @@ const AppRouter = (() => {
   async function openOutfitInBuilder(outfitId) {
     const outfits = await OutfitsModule.fetchOutfits();
     const outfit  = outfits.find(o => o.id === outfitId);
-    if (outfit) { OutfitBuilder.loadOutfit(outfit); navigate('builder'); }
+    if (outfit) { 
+      OutfitBuilder.loadOutfit(outfit); 
+      document.getElementById('outfit-name-input').value = outfit.name;
+      navigate('builder'); 
+    }
   }
 
   // ── Helpers ───────────────────────────────────────────────────

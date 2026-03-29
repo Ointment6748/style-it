@@ -8,7 +8,7 @@ const WardrobeModule = (() => {
   let items = [];
 
   // ── Upload a ready blob (post bg-removal or manual cut) ──────
-  async function uploadProcessedBlob(blob, name, category) {
+  async function uploadProcessedBlob(blob, name, category, color, style) {
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.png`;
     const { data: storageData, error: storageErr } = await db.storage
       .from(STORAGE_BUCKET)
@@ -22,7 +22,7 @@ const WardrobeModule = (() => {
 
     const { data, error } = await db
       .from('wardrobe_items')
-      .insert([{ name, category, image_url: urlData.publicUrl }])
+      .insert([{ name, category, color, style, image_url: urlData.publicUrl }])
       .select()
       .single();
 
@@ -32,12 +32,13 @@ const WardrobeModule = (() => {
   }
 
   // ── Fetch ────────────────────────────────────────────────────
-  async function fetchItems(category = null) {
+  async function fetchItems(category = null, colorSearch = null) {
     let query = db
       .from('wardrobe_items')
       .select('*')
       .order('created_at', { ascending: false });
     if (category && category !== 'all') query = query.eq('category', category);
+    if (colorSearch) query = query.ilike('color', `%${colorSearch}%`);
     const { data, error } = await query;
     if (error) throw error;
     items = data;

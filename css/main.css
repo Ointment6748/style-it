@@ -403,10 +403,15 @@ ul, ol { list-style: none; }
 .outfit-preview {
   position: relative; height: 220px; background: var(--bg-2); overflow: hidden;
 }
-.outfit-preview img {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%; object-fit: contain; padding: 8px;
+.outfit-preview.grid-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px; padding: 8px;
+  background: var(--bg-1);
 }
+.preview-slot { background: var(--bg-2); border-radius: 4px; padding: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.preview-slot img { position: static; width: 100%; height: 100%; object-fit: contain; padding: 0; }
 .outfit-info {
   padding: 12px 14px 8px;
   display: flex; flex-direction: column; gap: 4px;
@@ -588,16 +593,26 @@ ul, ol { list-style: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 24px 16px;
-  gap: 20px;
+  gap: 16px;
 }
-.carousel-preview-canvas img {
+.layer-window {
+  width: 100%;
+  max-width: 240px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 8px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.layer-window img {
   position: relative;
   max-width: 100%;
-  height: 180px;
+  height: 140px;
   object-fit: contain;
-  transform-origin: center center;
+  margin: 0 auto;
 }
 
 /* ── Manual Cut Modal ──────────────────────────────────────── */

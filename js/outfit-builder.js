@@ -6,6 +6,7 @@ const OutfitBuilder = (() => {
   let layers = []; // [{id (unique layer id), item_id, image_url, name, x, y, z, scale}]
   let selectedLayerId = null;
   let dragState = null;
+  let editingOutfitId = null;
   const canvas = document.getElementById('builder-canvas');
   const layersList = document.getElementById('layers-list');
   const scaleSlider = document.getElementById('scale-slider');
@@ -180,23 +181,29 @@ const OutfitBuilder = (() => {
       z: l.z,
       scale: l.scale,
     }));
-    const { data, error } = await db
-      .from('outfits')
-      .insert([{ name, layers: payload }])
-      .select()
-      .single();
+    
+    let query = db.from('outfits');
+    if (editingOutfitId) {
+      query = query.update({ name, layers: payload }).eq('id', editingOutfitId);
+    } else {
+      query = query.insert([{ name, layers: payload }]);
+    }
+    
+    const { data, error } = await query.select().single();
     if (error) throw error;
     return data;
   }
 
   // ── Load Outfit ───────────────────────────────────────────────
   function loadOutfit(outfit) {
+    editingOutfitId = outfit.id;
     layers = outfit.layers.map(l => ({ ...l, id: crypto.randomUUID() }));
     selectedLayerId = null;
     renderCanvas();
   }
 
   function clearCanvas() {
+    editingOutfitId = null;
     layers = [];
     selectedLayerId = null;
     renderCanvas();

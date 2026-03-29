@@ -32,8 +32,8 @@ const OutfitsModule = (() => {
       const card = document.createElement('div');
       card.className = 'outfit-card glass';
       card.innerHTML = `
-        <div class="outfit-preview">
-          ${outfit.layers.slice(0, 3).map(l => `<img src="${l.image_url}" alt="${l.name}" style="z-index:${l.z}" />`).join('')}
+        <div class="outfit-preview grid-preview">
+          ${outfit.layers.slice(0, 4).map(l => `<div class="preview-slot"><img src="${l.image_url}" alt="${l.name}" /></div>`).join('')}
         </div>
         <div class="outfit-info">
           <span class="outfit-name">${outfit.name}</span>
