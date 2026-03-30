@@ -1,7 +1,64 @@
+import { pipeline, env } from '@huggingface/transformers';
+
+env.allowLocalModels = false;
+env.useBrowserCache = true;
+
+let AI_SEGMENTER = null;
+
+async function executeRMBG(file, updateProgress) {
+  if (!AI_SEGMENTER) {
+    updateProgress('Downloading AI model (~45MB once)…', 5);
+    AI_SEGMENTER = await pipeline('image-segmentation', 'Xenova/modnet', {
+      progress_callback: (info) => {
+        if (info.status === 'progress' && info.progress !== undefined) {
+          updateProgress(`Downloading ${info.file}…`, 5 + Math.floor(info.progress * 0.45));
+        }
+      }
+    });
+    document.dispatchEvent(new CustomEvent('aiModelReady'));
+  }
+  
+  updateProgress('Preparing image…', 55);
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.src = url;
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+  
+  updateProgress('Running RMBG-1.4 segmenter…', 70);
+  const result = await AI_SEGMENTER(url);
+  
+  updateProgress('Applying transparency mask…', 85);
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+
+  const maskCanvas = result[0].mask.toCanvas();
+  
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.drawImage(maskCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
+  
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const maskData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
+  
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    imgData.data[i + 3] = (imgData.data[i + 3] * maskData.data[i]) / 255;
+  }
+  ctx.putImageData(imgData, 0, 0);
+  URL.revokeObjectURL(url);
+  
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), 'image/png');
+  });
+}
+
 // ============================================================
 // App Router — view switching, upload flow, carousel builder
 // ============================================================
-
 const AppRouter = (() => {
   let currentView = 'wardrobe';
   let allWardrobeItems = [];
@@ -264,21 +321,9 @@ const AppRouter = (() => {
 
       try {
         if (bgMode === 'auto') {
-          progressText.textContent = 'Removing background…';
-          progressBar.style.width  = '15%';
-
-          const removeFn = window.__bgRemove;
-          if (!removeFn) throw new Error('BG removal not ready — try Manual Cut or None.');
-
-          finalBlob = await removeFn(file, {
-            model: "isnet_quint8",
-            devicePixelRatio: 1, // Speeds up process on mobile displays
-            progress: (key, current, total) => {
-              if (total > 0) {
-                const pct = 15 + Math.floor((current / total) * 70);
-                progressBar.style.width = Math.min(pct, 85) + '%';
-              }
-            },
+          finalBlob = await executeRMBG(file, (text, pct) => {
+            progressText.textContent = text;
+            progressBar.style.width  = pct + '%';
           });
 
         } else if (bgMode === 'manual') {

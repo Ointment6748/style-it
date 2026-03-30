@@ -12,18 +12,7 @@
   <link rel="stylesheet" href="css/main.css" />
 
 
-  <!-- Background Removal — ESM (runs async, sets window.__bgRemove before any upload attempt) -->
-  <script type="module">
-    try {
-      const { removeBackground, Config } = await import('@imgly/background-removal');
-      window.__bgRemove = removeBackground;
-      console.log('[Style-It] BG removal ready ✓');
-      document.dispatchEvent(new CustomEvent('aiModelReady'));
-    } catch (e) {
-      console.warn('[Style-It] BG removal unavailable:', e.message);
-      window.__bgRemove = null;
-    }
-  </script>
+  <!-- Background Removal moved to app.js lazy loader -->
 </head>
 
 <body>
