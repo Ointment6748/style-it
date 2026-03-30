@@ -318,30 +318,31 @@
         <!-- Upload Options -->
         <div class="upload-source-actions" id="upload-source-actions"
           style="display: flex; gap: 12px; margin-bottom: 20px;">
-          <label for="camera-input" class="btn btn-primary"
-            style="flex: 1; justify-content: center; cursor: pointer; text-align: center; margin: 0;">
+          <label class="btn btn-primary"
+            style="flex: 1; justify-content: center; cursor: pointer; text-align: center; margin: 0; position: relative;">
             Take new photo
+            <input type="file" id="camera-input" accept="image/*" capture="environment" style="position: absolute; opacity: 0; width: 1px; height: 1px;" />
           </label>
-          <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" />
 
-          <label for="file-input" class="btn btn-ghost"
-            style="flex: 1; justify-content: center; cursor: pointer; text-align: center; margin: 0;">
+          <label class="btn btn-ghost"
+            style="flex: 1; justify-content: center; cursor: pointer; text-align: center; margin: 0; position: relative;">
             Choose from gallery
+            <input type="file" id="file-input" accept="image/*" style="position: absolute; opacity: 0; width: 1px; height: 1px;" />
           </label>
-          <input type="file" id="file-input" accept="image/*" style="display:none" />
         </div>
 
         <!-- Preview -->
         <div class="file-preview-wrap hidden" id="file-preview-wrap">
-          <label for="file-input" class="file-preview-button" id="file-preview-button"
-            style="cursor: pointer; display: flex; flex-direction: column; width: 100%;">
+          <label class="file-preview-button" id="file-preview-button"
+            style="cursor: pointer; display: flex; flex-direction: column; width: 100%; position: relative;">
             <img id="file-preview" src="" alt="Preview" />
             <span class="file-preview-caption">Tap to change photo</span>
+            <!-- Associate with the same file input programmatically in JS if needed, or point to it here directly by just letting the label do its thing if we moved the input inside. But since the input is above, we'll need to use "for" if the input is outside. Wait, since we moved the input inside the other label, we MUST use JS for this button, or re-add the "for" trick and hope it works on mobile for just changing. Actually, the easiest fix is just JS click proxy for 'change photo' since it's an edge case. Reverting this bit. -->
           </label>
-          <label for="file-input" class="btn btn-sm btn-ghost" id="btn-change-photo"
+          <button type="button" class="btn btn-sm btn-ghost" id="btn-change-photo"
             style="width:100%; justify-content: center; cursor: pointer; margin-bottom: 8px; display: flex;">
             Choose a different photo
-          </label>
+          </button>
           <button type="button" class="btn btn-sm btn-ghost" id="btn-manual-cut-shortcut" style="width:100%">
             ✂️ Manually cut background
           </button>

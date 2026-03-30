@@ -147,6 +147,8 @@ const AppRouter = (() => {
     const cameraInput  = document.getElementById('camera-input');
     const previewWrap  = document.getElementById('file-preview-wrap');
     const preview      = document.getElementById('file-preview');
+    const previewBtn   = document.getElementById('file-preview-button');
+    const changeBtn    = document.getElementById('btn-change-photo');
     const progressEl   = document.getElementById('upload-progress');
     const progressBar  = document.getElementById('upload-progress-bar');
     const progressText = document.getElementById('upload-progress-text');
@@ -157,6 +159,9 @@ const AppRouter = (() => {
 
     fileInput.addEventListener('change', async () => { if (fileInput.files[0]) await prepareSelectedFile(fileInput.files[0]); });
     cameraInput.addEventListener('change', async () => { if (cameraInput.files[0]) await prepareSelectedFile(cameraInput.files[0]); });
+
+    previewBtn.addEventListener('click', () => fileInput.click());
+    changeBtn.addEventListener('click', () => fileInput.click());
 
     // Manual cut shortcut button
     document.getElementById('btn-manual-cut-shortcut').addEventListener('click', async () => {
