@@ -432,6 +432,7 @@ ul, ol { list-style: none; }
   position: absolute;
   cursor: move;
   user-select: none;
+  touch-action: none;
   max-width: 200px;
   max-height: 280px;
   object-fit: contain;
