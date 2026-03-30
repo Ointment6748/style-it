@@ -76,12 +76,14 @@ const AppRouter = (() => {
     outfits : document.getElementById('view-outfits'),
   };
   const navLinks = document.querySelectorAll('.nav-link');
+  const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
 
   // ── Navigation ───────────────────────────────────────────────
   function navigate(view) {
     currentView = view;
     Object.keys(views).forEach(k => views[k].classList.toggle('hidden', k !== view));
     navLinks.forEach(a => a.classList.toggle('active', a.dataset.view === view));
+    mobileNavItems.forEach(a => a.classList.toggle('active', a.dataset.view === view));
     window.location.hash = view;
     onViewEnter(view);
   }
@@ -633,6 +635,7 @@ const AppRouter = (() => {
   function init() {
     initThemes();
     navLinks.forEach(a => a.addEventListener('click', e => { e.preventDefault(); navigate(a.dataset.view); }));
+    mobileNavItems.forEach(a => a.addEventListener('click', e => { e.preventDefault(); navigate(a.dataset.view); }));
     initBuilderTabs();
     initUploadFlow();
     initCategoryFilter();

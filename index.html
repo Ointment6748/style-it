@@ -35,7 +35,7 @@
 <body>
   <div class="app-layout">
 
-    <!-- ── Navbar ─────────────────────────────────────────────── -->
+    <!-- ── Navbar (desktop only) ──────────────────────────────── -->
     <nav class="navbar">
       <div class="nav-brand" id="brand-logo" style="cursor: pointer; user-select: none;">
         <div class="logo-dot"></div>
@@ -49,8 +49,32 @@
       </div>
     </nav>
 
+    <!-- ── Mobile Top Bar (mobile only) ─────────────────────────── -->
+    <header class="mobile-top-bar">
+      <span class="mobile-top-bar-title">Kuchupuchu ❤️</span>
+      <button class="btn-icon" id="btn-theme-toggle-mobile" title="Toggle Theme">🌓</button>
+    </header>
+
+    <!-- ── Mobile Bottom Nav (mobile only) ──────────────────────── -->
+    <nav class="mobile-bottom-nav" aria-label="Main navigation">
+      <a href="#wardrobe" class="mobile-nav-item" data-view="wardrobe">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span>Wardrobe</span>
+      </a>
+      <a href="#builder" class="mobile-nav-item" data-view="builder">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <span>Builder</span>
+      </a>
+      <a href="#outfits" class="mobile-nav-item" data-view="outfits">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Outfits</span>
+      </a>
+    </nav>
+
     <!-- ── Main ───────────────────────────────────────────────── -->
     <main class="main">
+      <!-- Mobile-only: spacer to push content below the fixed brand bar -->
+      <div class="mobile-brand-spacer"></div>
 
       <!-- ══════════════════════════════════════════
          VIEW: WARDROBE

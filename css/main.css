@@ -156,7 +156,48 @@ ul, ol { list-style: none; }
   background: var(--accent);
   box-shadow: 0 0 8px var(--accent-glow);
 }
+.mobile-brand-spacer { display: none; }
+
+/* ── Mobile-only nav elements (hidden on desktop) ───────────── */
+.mobile-top-bar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; height: 52px;
+  background: rgba(9, 9, 15, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  align-items: center; justify-content: center;
+  z-index: 200; padding: 0 16px;
+}
+.mobile-top-bar-title {
+  font-weight: 700; font-size: 1.05rem; letter-spacing: -0.02em;
+  color: var(--text-1); flex: 1; text-align: center;
+}
+.mobile-bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+  background: rgba(9, 9, 15, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid var(--glass-border);
+  align-items: center; justify-content: space-around;
+  z-index: 200; padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.mobile-nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; flex: 1; padding: 6px 4px;
+  color: var(--text-2); text-decoration: none;
+  font-size: 0.65rem; font-weight: 500; border-radius: 10px;
+  transition: color var(--transition), background var(--transition);
+  min-height: 44px;
+}
+.mobile-nav-item span { line-height: 1; }
+.mobile-nav-item svg { transition: stroke var(--transition); }
+.mobile-nav-item.active,
+.mobile-nav-item:active { color: var(--accent); background: rgba(168,85,247,0.12); }
+
 .nav-links { display: flex; gap: 4px; }
+
 .nav-link {
   padding: 6px 16px;
   border-radius: 99px;
@@ -534,37 +575,17 @@ ul, ol { list-style: none; }
   .builder-wardrobe-panel { flex-direction: row; flex-wrap: wrap; }
 }
 @media (max-width: 768px) {
-  .app-layout { padding-bottom: 72px; }
-  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .navbar {
-    top: auto; bottom: 0; height: 64px; padding: 0 4px;
-    flex-direction: row; justify-content: center;
-    border-top: 1px solid var(--glass-border); border-bottom: none;
-  }
-  .nav-brand {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 52px;
-    background: rgba(9, 9, 15, 0.9);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--glass-border);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100;
-  }
-  /* Move theme toggle to top-right of brand bar on mobile */
-  #btn-theme-toggle {
-    position: fixed !important;
-    top: 8px; right: 12px;
-    width: 36px !important; height: 36px !important;
-    z-index: 101; margin: 0 !important;
-  }
-  /* Hide the theme toggle inside the bottom bar (now positioned fixed above) */
-  .nav-links #btn-theme-toggle { display: none !important; }
-  .main { padding-top: 68px; padding-bottom: 24px; }
-  .nav-links { width: 100%; justify-content: space-evenly; flex-wrap: nowrap; gap: 0; align-items: center; }
-  .nav-link { padding: 8px 6px; font-size: 0.68rem; flex: 1; text-align: center; border-radius: 8px; white-space: nowrap; }
+  /* Hide the desktop navbar on mobile */
+  .navbar { display: none !important; }
   
+  /* Show mobile elements */
+  .mobile-top-bar { display: flex; }
+  .mobile-bottom-nav { display: flex; }
+
+  .app-layout { padding-top: 56px; padding-bottom: 68px; }
+  .main { padding-top: 12px; padding-bottom: 16px; }
+  .mobile-brand-spacer { display: none; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
   .modal-backdrop { align-items: flex-end; padding: 0; }
   .modal { 
     margin: 0; border-radius: 24px 24px 0 0; border-bottom: none; 
@@ -576,20 +597,10 @@ ul, ol { list-style: none; }
   .page-header-wardrobe { align-items: stretch; }
   .page-header-wardrobe .page-title { width: 100%; }
   .btn-upload-mobile { width: 100%; justify-content: center; min-height: 44px; }
-  .modal-header,
-  .modal-body {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
+  .modal-header, .modal-body { padding-left: 16px; padding-right: 16px; }
   .bg-mode-group { flex-wrap: wrap; }
-  .bg-mode-opt {
-    flex: 1 1 calc(50% - 8px);
-    justify-content: center;
-  }
-  .upload-source-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
+  .bg-mode-opt { flex: 1 1 calc(50% - 8px); justify-content: center; }
+  .upload-source-actions .btn { width: 100%; justify-content: center; }
 }
 
 /* ── Builder Tabs ───────────────────────────────────────────── */
