@@ -144,29 +144,43 @@ const AppRouter = (() => {
     const closeBtn     = document.getElementById('btn-close-upload');
     const form         = document.getElementById('upload-form');
     const fileInput    = document.getElementById('file-input');
+    const cameraInput  = document.getElementById('camera-input');
     const previewWrap  = document.getElementById('file-preview-wrap');
     const preview      = document.getElementById('file-preview');
+    const previewBtn   = document.getElementById('file-preview-button');
+    const changeBtn    = document.getElementById('btn-change-photo');
+    const takePhotoBtn = document.getElementById('btn-take-photo');
+    const galleryBtn   = document.getElementById('btn-open-gallery');
     const dropZone     = document.getElementById('drop-zone');
     const progressEl   = document.getElementById('upload-progress');
     const progressBar  = document.getElementById('upload-progress-bar');
     const progressText = document.getElementById('upload-progress-text');
+    let selectedFile   = null;
 
     openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
     closeBtn.addEventListener('click', resetUploadModal);
 
     dropZone.addEventListener('dragover', e  => { e.preventDefault(); dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-    dropZone.addEventListener('drop', e => {
+    dropZone.addEventListener('drop', async e => {
       e.preventDefault(); dropZone.classList.remove('drag-over');
       const f = e.dataTransfer.files[0];
-      if (f && f.type.startsWith('image/')) { fileInput.files = e.dataTransfer.files; showPreview(f); }
+      if (f && f.type.startsWith('image/')) await prepareSelectedFile(f);
     });
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', () => { if (fileInput.files[0]) showPreview(fileInput.files[0]); });
+    dropZone.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      fileInput.click();
+    });
+    fileInput.addEventListener('change', async () => { if (fileInput.files[0]) await prepareSelectedFile(fileInput.files[0]); });
+    cameraInput.addEventListener('change', async () => { if (cameraInput.files[0]) await prepareSelectedFile(cameraInput.files[0]); });
+    previewBtn.addEventListener('click', () => fileInput.click());
+    changeBtn.addEventListener('click', () => fileInput.click());
+    takePhotoBtn.addEventListener('click', () => cameraInput.click());
+    galleryBtn.addEventListener('click', () => fileInput.click());
 
     // Manual cut shortcut button
     document.getElementById('btn-manual-cut-shortcut').addEventListener('click', async () => {
-      const file = fileInput.files[0];
+      const file = selectedFile;
       if (!file) { alert('Select a photo first.'); return; }
       const blob = await BgCrop.openForFile(file);
       if (blob) {
@@ -179,10 +193,50 @@ const AppRouter = (() => {
       }
     });
 
+    async function prepareSelectedFile(file) {
+      try {
+        selectedFile = await normalizeImageFile(file);
+        showPreview(selectedFile);
+      } catch (err) {
+        selectedFile = null;
+        fileInput.value = '';
+        cameraInput.value = '';
+        alert(err.message);
+      }
+    }
+
     function showPreview(file) {
       preview.src = URL.createObjectURL(file);
       previewWrap.classList.remove('hidden');
       delete previewWrap._processedBlob;
+    }
+
+    async function normalizeImageFile(file) {
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Please choose an image file.');
+      }
+      if (/image\/(heic|heif)/i.test(file.type) || /\.(heic|heif)$/i.test(file.name)) {
+        throw new Error('This photo format is not supported here yet. Please use the camera option or convert it to JPG/PNG first.');
+      }
+
+      try {
+        const bitmap = await createImageBitmap(file);
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap, 0, 0);
+        bitmap.close();
+
+        const normalizedBlob = await new Promise((resolve, reject) => {
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Unable to prepare this image for upload.')), 'image/png');
+        });
+
+        const baseName = file.name.replace(/\.[^.]+$/, '') || 'photo';
+        return new File([normalizedBlob], `${baseName}.png`, { type: 'image/png' });
+      } catch (error) {
+        throw new Error('Upload failed: this photo could not be decoded. Try taking a new photo, choosing a different image, or switching background removal to None.');
+      }
     }
 
     function resetUploadModal() {
@@ -190,6 +244,9 @@ const AppRouter = (() => {
       form.reset();
       preview.src = '';
       previewWrap.classList.add('hidden');
+      selectedFile = null;
+      fileInput.value = '';
+      cameraInput.value = '';
       delete previewWrap._processedBlob;
       progressEl.classList.add('hidden');
       progressBar.style.width = '0%';
@@ -197,7 +254,7 @@ const AppRouter = (() => {
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
-      const file     = fileInput.files[0];
+      const file     = selectedFile;
       const name     = document.getElementById('item-name').value.trim();
       const category = document.getElementById('item-category').value;
       const color    = document.getElementById('item-color').value.trim() || null;
@@ -255,7 +312,10 @@ const AppRouter = (() => {
         setTimeout(() => { resetUploadModal(); loadWardrobe(); }, 600);
 
       } catch (err) {
-        alert('Upload failed: ' + err.message);
+        const msg = /could not be decoded|source image could not be decoded/i.test(err.message)
+          ? 'This photo format could not be processed. Try Take new photo, Choose from gallery again, or set Background Removal to None.'
+          : err.message;
+        alert('Upload failed: ' + msg);
         progressEl.classList.add('hidden');
       } finally {
         submitBtn.disabled = false;

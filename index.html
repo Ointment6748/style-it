@@ -45,9 +45,9 @@
          VIEW: WARDROBE
     ═══════════════════════════════════════════ -->
     <section id="view-wardrobe" class="view">
-      <div class="page-header">
+      <div class="page-header page-header-wardrobe">
         <h1 class="page-title">My <span>Wardrobe</span></h1>
-        <button class="btn btn-primary" id="btn-open-upload">
+        <button class="btn btn-primary btn-upload-mobile" id="btn-open-upload">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Upload Item
         </button>
@@ -296,12 +296,23 @@
         <div class="drop-icon">📷</div>
         <p><strong>Click or drag</strong> a photo here</p>
         <p style="margin-top:4px;font-size:0.73rem;color:var(--text-3);">JPG · PNG · WEBP</p>
+        <div class="upload-source-actions">
+          <button type="button" class="btn btn-sm btn-primary" id="btn-take-photo">Take new photo</button>
+          <button type="button" class="btn btn-sm btn-ghost" id="btn-open-gallery">Choose from gallery</button>
+        </div>
         <input type="file" id="file-input" accept="image/*" style="display:none" />
+        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" />
       </div>
 
       <!-- Preview -->
       <div class="file-preview-wrap hidden" id="file-preview-wrap">
-        <img id="file-preview" src="" alt="Preview" />
+        <button type="button" class="file-preview-button" id="file-preview-button">
+          <img id="file-preview" src="" alt="Preview" />
+          <span class="file-preview-caption">Tap to change photo</span>
+        </button>
+        <button type="button" class="btn btn-sm btn-ghost" id="btn-change-photo" style="width:100%">
+          Choose a different photo
+        </button>
         <button class="btn btn-sm btn-ghost" id="btn-manual-cut-shortcut" style="margin-top:8px;width:100%">
           ✂️ Manually cut background
         </button>
