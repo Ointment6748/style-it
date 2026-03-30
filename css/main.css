@@ -552,7 +552,7 @@ ul, ol { list-style: none; }
     display: flex; align-items: center; justify-content: center;
     z-index: 99;
   }
-  .main { padding-top: 60px; } /* Space for fixed mobile brand */
+  .main { padding-top: 85px; padding-bottom: 24px; } /* Space for fixed mobile brand */
   .nav-links { width: 100%; justify-content: space-evenly; flex-wrap: nowrap; gap: 4px; }
   .nav-link { padding: 8px 6px; font-size: 0.75rem; flex: 1; text-align: center; border-radius: 12px; }
   #btn-theme-toggle { margin-left: 0 !important; width: 44px; height: 44px; }

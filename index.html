@@ -11,8 +11,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="css/main.css" />
 
+  <!-- PWA -->
+  <link rel="manifest" href="/style-it/manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Kuchupuchu" />
+  <meta name="theme-color" content="#09090f" />
+  <link rel="apple-touch-icon" href="/style-it/icon-192.png" />
 
   <!-- Background Removal moved to app.js lazy loader -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/style-it/sw.js').then(() => {
+          console.log('[Style-It] Service Worker registered ✓');
+        }).catch(e => console.warn('[Style-It] SW registration failed:', e));
+      });
+    }
+  </script>
 </head>
 
 <body>

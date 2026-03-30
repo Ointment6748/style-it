@@ -1,0 +1,25 @@
+{
+  "name": "Kuchupuchu ❤️",
+  "short_name": "Kuchupuchu",
+  "description": "Your digital wardrobe — upload clothing, remove backgrounds, and build outfits.",
+  "start_url": "/style-it/",
+  "scope": "/style-it/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090f",
+  "theme_color": "#09090f",
+  "icons": [
+    {
+      "src": "/style-it/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/style-it/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
