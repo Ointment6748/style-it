@@ -147,11 +147,6 @@ const AppRouter = (() => {
     const cameraInput  = document.getElementById('camera-input');
     const previewWrap  = document.getElementById('file-preview-wrap');
     const preview      = document.getElementById('file-preview');
-    const previewBtn   = document.getElementById('file-preview-button');
-    const changeBtn    = document.getElementById('btn-change-photo');
-    const takePhotoBtn = document.getElementById('btn-take-photo');
-    const galleryBtn   = document.getElementById('btn-open-gallery');
-    const dropZone     = document.getElementById('drop-zone');
     const progressEl   = document.getElementById('upload-progress');
     const progressBar  = document.getElementById('upload-progress-bar');
     const progressText = document.getElementById('upload-progress-text');
@@ -160,23 +155,8 @@ const AppRouter = (() => {
     openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
     closeBtn.addEventListener('click', resetUploadModal);
 
-    dropZone.addEventListener('dragover', e  => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-    dropZone.addEventListener('drop', async e => {
-      e.preventDefault(); dropZone.classList.remove('drag-over');
-      const f = e.dataTransfer.files[0];
-      if (f && f.type.startsWith('image/')) await prepareSelectedFile(f);
-    });
-    dropZone.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      fileInput.click();
-    });
     fileInput.addEventListener('change', async () => { if (fileInput.files[0]) await prepareSelectedFile(fileInput.files[0]); });
     cameraInput.addEventListener('change', async () => { if (cameraInput.files[0]) await prepareSelectedFile(cameraInput.files[0]); });
-    previewBtn.addEventListener('click', () => fileInput.click());
-    changeBtn.addEventListener('click', () => fileInput.click());
-    takePhotoBtn.addEventListener('click', () => cameraInput.click());
-    galleryBtn.addEventListener('click', () => fileInput.click());
 
     // Manual cut shortcut button
     document.getElementById('btn-manual-cut-shortcut').addEventListener('click', async () => {
@@ -561,7 +541,34 @@ const AppRouter = (() => {
   }
 
   // ── Init ──────────────────────────────────────────────────────
+  function initThemes() {
+    const toggleBtn = document.getElementById('btn-theme-toggle');
+    const brandLogo = document.getElementById('brand-logo');
+    let clickCount = 0;
+    let clickTimer = null;
+
+    toggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+      toggleBtn.textContent = isDark ? '🌙' : '🌓';
+    });
+
+    brandLogo.addEventListener('click', () => {
+      clickCount++;
+      clearTimeout(clickTimer);
+      if (clickCount >= 5) {
+        document.documentElement.dataset.theme = 'kisses';
+        toggleBtn.textContent = '💋';
+        showToast('Secret Theme Unlocked! 💋');
+        clickCount = 0;
+      } else {
+        clickTimer = setTimeout(() => { clickCount = 0; }, 800);
+      }
+    });
+  }
+
   function init() {
+    initThemes();
     navLinks.forEach(a => a.addEventListener('click', e => { e.preventDefault(); navigate(a.dataset.view); }));
     initBuilderTabs();
     initUploadFlow();

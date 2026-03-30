@@ -7,7 +7,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ── Variables ─────────────────────────────────────────────── */
-:root {
+:root[data-theme="dark"] {
   --bg-0: #09090f;
   --bg-1: #111120;
   --bg-2: #191930;
@@ -29,6 +29,57 @@
   --shadow: 0 8px 32px rgba(0,0,0,0.4);
   --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
   --transition: 0.2s ease;
+}
+
+:root[data-theme="light"] {
+  --bg-0: #f1f5f9;
+  --bg-1: #ffffff;
+  --bg-2: #f8fafc;
+  --glass: rgba(0, 0, 0, 0.02);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-hover: rgba(0, 0, 0, 0.04);
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-dim: rgba(99, 102, 241, 0.1);
+  --accent-glow: rgba(99, 102, 241, 0.2);
+  --danger: #ef4444;
+  --danger-dim: rgba(239, 68, 68, 0.1);
+  --text-1: #0f172a;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+  --shadow: 0 12px 40px rgba(0,0,0,0.06);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+:root[data-theme="kisses"] {
+  --bg-0: #fff0f5;
+  --bg-1: #ffeeef;
+  --bg-2: #ffe4e1;
+  --glass: rgba(255, 105, 180, 0.1);
+  --glass-border: rgba(255, 105, 180, 0.3);
+  --glass-hover: rgba(255, 105, 180, 0.2);
+  --accent: #ff1493;
+  --accent-light: #ff69b4;
+  --accent-dim: rgba(255, 20, 147, 0.2);
+  --accent-glow: rgba(255, 20, 147, 0.4);
+  --danger: #ff4500;
+  --danger-dim: rgba(255, 69, 0, 0.2);
+  --text-1: #d21f3c; /* cute dark pink/red */
+  --text-2: #db7093;
+  --text-3: #ffb6c1;
+  --shadow: 0 12px 40px rgba(255, 105, 180, 0.2);
+  --shadow-sm: 0 2px 8px rgba(255, 105, 180, 0.15);
+}
+
+/* Kisses Theme overrides - cute additions! */
+:root[data-theme="kisses"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>💋</text></svg>"), auto;
+}
+:root[data-theme="kisses"] .logo-dot {
+  background: var(--accent);
+  border-radius: 50% 50% 0 50%;
+  transform: rotate(-45deg);
+  width: 14px; height: 14px;
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */
@@ -240,23 +291,7 @@ ul, ol { list-style: none; }
 .modal-close:hover { color: var(--text-1); background: var(--glass-hover); }
 .modal-body { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 16px; }
 
-/* Drop zone */
-.drop-zone {
-  border: 2px dashed var(--glass-border);
-  border-radius: var(--radius);
-  padding: 32px 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color var(--transition), background var(--transition);
-  color: var(--text-3);
-}
-.drop-zone:hover, .drop-zone.drag-over {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-}
-.drop-zone .drop-icon { font-size: 2rem; margin-bottom: 8px; }
-.drop-zone p { font-size: 0.85rem; }
-.drop-zone p strong { color: var(--accent-light); }
+/* Upload Actions */
 .upload-source-actions {
   display: flex;
   justify-content: center;
