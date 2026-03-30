@@ -15,9 +15,10 @@
   <!-- Background Removal — ESM (runs async, sets window.__bgRemove before any upload attempt) -->
   <script type="module">
     try {
-      const { removeBackground } = await import('@imgly/background-removal');
+      const { removeBackground, Config } = await import('@imgly/background-removal');
       window.__bgRemove = removeBackground;
       console.log('[Style-It] BG removal ready ✓');
+      document.dispatchEvent(new CustomEvent('aiModelReady'));
     } catch (e) {
       console.warn('[Style-It] BG removal unavailable:', e.message);
       window.__bgRemove = null;
@@ -132,12 +133,24 @@
             </div>
 
             <div class="canvas-wrap">
-              <div class="canvas-toolbar">
-                <div class="scale-control">
-                  <label for="scale-slider">Scale</label>
-                  <input type="range" id="scale-slider" min="0.2" max="2.5" step="0.05" value="1" />
+              <div class="canvas-toolbar" style="flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                  <div class="scale-control">
+                    <label for="scale-slider">Scale</label>
+                    <input type="range" id="scale-slider" min="0.2" max="2.5" step="0.05" value="1" />
+                  </div>
+                  
+                  <div class="dpad-control" style="display: flex; gap: 2px; align-items: center;">
+                    <button class="btn btn-sm btn-ghost" id="btn-move-left" title="Move Left" style="padding: 4px 8px; font-size: 1.1rem;">←</button>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                      <button class="btn btn-sm btn-ghost" id="btn-move-up" title="Move Up" style="padding: 2px 6px; font-size: 0.9rem; line-height: 1;">↑</button>
+                      <button class="btn btn-sm btn-ghost" id="btn-move-down" title="Move Down" style="padding: 2px 6px; font-size: 0.9rem; line-height: 1;">↓</button>
+                    </div>
+                    <button class="btn btn-sm btn-ghost" id="btn-move-right" title="Move Right" style="padding: 4px 8px; font-size: 1.1rem;">→</button>
+                  </div>
                 </div>
-                <span style="font-size:0.72rem;color:var(--text-3);">Click to select · Drag to move · ↑↓ reorder</span>
+                
+                <span class="desktop-hint" style="font-size:0.72rem;color:var(--text-3); display: none;">Use ←↑↓→ to move</span>
               </div>
               <div id="builder-canvas">
                 <div class="canvas-empty" id="builder-empty">
@@ -318,18 +331,18 @@
         <!-- Upload Options -->
         <div class="upload-source-actions" id="upload-source-actions"
           style="display: flex; gap: 12px; margin-bottom: 20px;">
-          <div class="btn btn-primary"
-            style="flex: 1; justify-content: center; cursor: pointer; text-align: center; margin: 0; position: relative; overflow: hidden;">
+          <button type="button" class="btn btn-primary" id="btn-camera"
+            style="flex: 1; justify-content: center; text-align: center; margin: 0;">
             Take new photo
-            <input type="file" id="camera-input" accept="image/*" capture="environment" style="position: absolute; opacity: 0; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; cursor: pointer;" />
-          </div>
-
-          <div class="btn btn-ghost"
-            style="flex: 1; justify-content: center; cursor: pointer; text-align: center; margin: 0; position: relative; overflow: hidden;">
+          </button>
+          
+          <button type="button" class="btn btn-ghost" id="btn-gallery"
+            style="flex: 1; justify-content: center; text-align: center; margin: 0;">
             Choose from gallery
-            <input type="file" id="file-input" accept="image/*" style="position: absolute; opacity: 0; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; cursor: pointer;" />
-          </div>
+          </button>
         </div>
+        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" />
+        <input type="file" id="file-input" accept="image/*" style="display: none;" />
 
         <!-- Preview -->
         <div class="file-preview-wrap hidden" id="file-preview-wrap">

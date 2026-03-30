@@ -152,6 +152,8 @@ const AppRouter = (() => {
     const progressEl   = document.getElementById('upload-progress');
     const progressBar  = document.getElementById('upload-progress-bar');
     const progressText = document.getElementById('upload-progress-text');
+    const cameraBtn    = document.getElementById('btn-camera');
+    const galleryBtn   = document.getElementById('btn-gallery');
     let selectedFile   = null;
 
     openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
@@ -159,6 +161,9 @@ const AppRouter = (() => {
 
     fileInput.addEventListener('change', async () => { if (fileInput.files[0]) await prepareSelectedFile(fileInput.files[0]); });
     cameraInput.addEventListener('change', async () => { if (cameraInput.files[0]) await prepareSelectedFile(cameraInput.files[0]); });
+
+    if (cameraBtn) cameraBtn.addEventListener('click', () => cameraInput.click());
+    if (galleryBtn) galleryBtn.addEventListener('click', () => fileInput.click());
 
     previewBtn.addEventListener('click', () => fileInput.click());
     changeBtn.addEventListener('click', () => fileInput.click());
@@ -235,6 +240,8 @@ const AppRouter = (() => {
       delete previewWrap._processedBlob;
       progressEl.classList.add('hidden');
       progressBar.style.width = '0%';
+      if (cameraBtn) cameraBtn.disabled = false;
+      if (galleryBtn) galleryBtn.disabled = false;
     }
 
     form.addEventListener('submit', async e => {
@@ -249,6 +256,8 @@ const AppRouter = (() => {
 
       const submitBtn = form.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
+      if (cameraBtn) cameraBtn.disabled = true;
+      if (galleryBtn) galleryBtn.disabled = true;
       progressEl.classList.remove('hidden');
 
       let finalBlob = null;
@@ -263,6 +272,7 @@ const AppRouter = (() => {
 
           finalBlob = await removeFn(file, {
             model: "isnet_quint8",
+            devicePixelRatio: 1, // Speeds up process on mobile displays
             progress: (key, current, total) => {
               if (total > 0) {
                 const pct = 15 + Math.floor((current / total) * 70);
@@ -305,6 +315,8 @@ const AppRouter = (() => {
         progressEl.classList.add('hidden');
       } finally {
         submitBtn.disabled = false;
+        if (cameraBtn) cameraBtn.disabled = false;
+        if (galleryBtn) galleryBtn.disabled = false;
         submitBtn.textContent = 'Add to Wardrobe';
       }
     });
@@ -584,6 +596,8 @@ const AppRouter = (() => {
     initClearCanvas();
     initCarouselControls();
     BgCrop.init();
+
+    document.addEventListener('aiModelReady', () => showToast('AI Background Removal Ready ✨'));
 
     const hash = window.location.hash.replace('#', '') || 'wardrobe';
     navigate(Object.keys(views).includes(hash) ? hash : 'wardrobe');

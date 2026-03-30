@@ -61,7 +61,7 @@ const OutfitBuilder = (() => {
     renderCanvas();
   }
 
-  // ── Drag logic ───────────────────────────────────────────────
+  // ── Drag & Pinch logic ───────────────────────────────────────
   function startDrag(e, layerId) {
     selectLayer(layerId);
     const layer = layers.find(l => l.id === layerId);
@@ -70,6 +70,16 @@ const OutfitBuilder = (() => {
     const isTouch = e.type === 'touchstart';
     const startX = isTouch ? e.touches[0].clientX : e.clientX;
     const startY = isTouch ? e.touches[0].clientY : e.clientY;
+
+    let initialPinchDistance = null;
+    let initialScale = layer.scale;
+
+    if (isTouch && e.touches.length === 2) {
+      initialPinchDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
 
     dragState = {
       layerId,
@@ -81,24 +91,44 @@ const OutfitBuilder = (() => {
 
     function onMove(ev) {
       if (!dragState) return;
-      // Prevent scrolling while dragging
+      // Prevent scrolling while dragging/pinching
       if (ev.cancelable) { ev.preventDefault(); }
       
+      const l = layers.find(layer => layer.id === dragState.layerId);
+      if (!l) return;
+
+      if (ev.type === 'touchmove' && ev.touches.length === 2) {
+        const currentDistance = Math.hypot(
+          ev.touches[0].clientX - ev.touches[1].clientX,
+          ev.touches[0].clientY - ev.touches[1].clientY
+        );
+        if (initialPinchDistance === null) {
+          initialPinchDistance = currentDistance;
+          initialScale = l.scale;
+        } else {
+          const scaleDelta = currentDistance / initialPinchDistance;
+          l.scale = Math.min(Math.max(0.2, initialScale * scaleDelta), 3.0);
+          updateScaleSlider();
+          const imgEl = canvas.querySelector(`[data-layer-id="${l.id}"]`);
+          if (imgEl) imgEl.style.transform = `scale(${l.scale})`;
+        }
+        return; // skip positional drag while scaling
+      } else {
+        initialPinchDistance = null;
+      }
+
       const cx = ev.type === 'touchmove' ? ev.touches[0].clientX : ev.clientX;
       const cy = ev.type === 'touchmove' ? ev.touches[0].clientY : ev.clientY;
 
       const dx = cx - dragState.startMouseX;
       const dy = cy - dragState.startMouseY;
       
-      const l = layers.find(l => l.id === dragState.layerId);
-      if (l) {
-        l.x = dragState.startLayerX + dx;
-        l.y = dragState.startLayerY + dy;
-        const imgEl = canvas.querySelector(`[data-layer-id="${l.id}"]`);
-        if (imgEl) {
-          imgEl.style.left = l.x + 'px';
-          imgEl.style.top = l.y + 'px';
-        }
+      l.x = dragState.startLayerX + dx;
+      l.y = dragState.startLayerY + dy;
+      const imgEl = canvas.querySelector(`[data-layer-id="${l.id}"]`);
+      if (imgEl) {
+        imgEl.style.left = l.x + 'px';
+        imgEl.style.top = l.y + 'px';
       }
     }
 
@@ -229,6 +259,26 @@ const OutfitBuilder = (() => {
     selectedLayerId = null;
     renderCanvas();
   }
+
+  // ── D-Pad Movement ────────────────────────────────────────────
+  function nudgeSelectedLayer(dx, dy) {
+    if (!selectedLayerId) return;
+    const l = layers.find(layer => layer.id === selectedLayerId);
+    if (!l) return;
+    l.x += dx;
+    l.y += dy;
+    const imgEl = canvas.querySelector(`[data-layer-id="${l.id}"]`);
+    if (imgEl) {
+      imgEl.style.left = l.x + 'px';
+      imgEl.style.top = l.y + 'px';
+    }
+  }
+
+  // Bind D-pad controls
+  document.getElementById('btn-move-left')?.addEventListener('click', () => nudgeSelectedLayer(-10, 0));
+  document.getElementById('btn-move-right')?.addEventListener('click', () => nudgeSelectedLayer(10, 0));
+  document.getElementById('btn-move-up')?.addEventListener('click', () => nudgeSelectedLayer(0, -10));
+  document.getElementById('btn-move-down')?.addEventListener('click', () => nudgeSelectedLayer(0, 10));
 
   return { addItem, moveUp, moveDown, removeLayer, onScaleChange, saveOutfit, loadOutfit, clearCanvas };
 })();
