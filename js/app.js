@@ -262,6 +262,7 @@ const AppRouter = (() => {
           if (!removeFn) throw new Error('BG removal not ready — try Manual Cut or None.');
 
           finalBlob = await removeFn(file, {
+            model: "isnet_quint8",
             progress: (key, current, total) => {
               if (total > 0) {
                 const pct = 15 + Math.floor((current / total) * 70);

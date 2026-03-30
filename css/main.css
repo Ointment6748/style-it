@@ -74,12 +74,44 @@
 /* Kisses Theme overrides - cute additions! */
 :root[data-theme="kisses"] {
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>💋</text></svg>"), auto;
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-lg: 32px;
+}
+:root[data-theme="kisses"] body {
+  background-image: radial-gradient(rgba(255,105,180,0.15) 2px, transparent 2px);
+  background-size: 24px 24px;
 }
 :root[data-theme="kisses"] .logo-dot {
   background: var(--accent);
   border-radius: 50% 50% 0 50%;
   transform: rotate(-45deg);
   width: 14px; height: 14px;
+}
+:root[data-theme="kisses"] .btn,
+:root[data-theme="kisses"] .cat-btn {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s, color 0.2s;
+}
+:root[data-theme="kisses"] .btn:active {
+  transform: scale(0.95);
+}
+:root[data-theme="kisses"] .btn:hover:not(:disabled),
+:root[data-theme="kisses"] .cat-btn:hover {
+  transform: scale(1.05);
+}
+:root[data-theme="kisses"] .modal,
+:root[data-theme="kisses"] .layer-window {
+  border: 1px solid rgba(255, 105, 180, 0.5);
+  box-shadow: 0 8px 32px rgba(255, 105, 180, 0.25);
+}
+:root[data-theme="kisses"] .navbar {
+  border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 105, 180, 0.1);
+}
+:root[data-theme="kisses"] .nav-brand {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', cursive;
+  transform: rotate(-2deg);
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */

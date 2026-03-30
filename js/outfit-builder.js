@@ -28,6 +28,7 @@ const OutfitBuilder = (() => {
       img.draggable = false;
 
       img.addEventListener('mousedown', (e) => startDrag(e, layer.id));
+      img.addEventListener('touchstart', (e) => startDrag(e, layer.id), {passive: false});
       img.addEventListener('click', () => selectLayer(layer.id));
       canvas.appendChild(img);
     });
@@ -62,22 +63,29 @@ const OutfitBuilder = (() => {
 
   // ── Drag logic ───────────────────────────────────────────────
   function startDrag(e, layerId) {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     selectLayer(layerId);
     const layer = layers.find(l => l.id === layerId);
-    const canvasRect = canvas.getBoundingClientRect();
+    
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
     dragState = {
       layerId,
-      startMouseX: e.clientX,
-      startMouseY: e.clientY,
+      startMouseX: clientX,
+      startMouseY: clientY,
       startLayerX: layer.x,
       startLayerY: layer.y,
     };
 
-    function onMove(e) {
+    function onMove(ev) {
       if (!dragState) return;
-      const dx = e.clientX - dragState.startMouseX;
-      const dy = e.clientY - dragState.startMouseY;
+      if (ev.cancelable) ev.preventDefault(); // prevent scrolling
+      const cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+      const cy = ev.touches ? ev.touches[0].clientY : ev.clientY;
+
+      const dx = cx - dragState.startMouseX;
+      const dy = cy - dragState.startMouseY;
       const l = layers.find(l => l.id === dragState.layerId);
       if (l) {
         l.x = dragState.startLayerX + dx;
@@ -94,10 +102,16 @@ const OutfitBuilder = (() => {
       dragState = null;
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+      document.removeEventListener('touchcancel', onUp);
     }
 
-    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mousemove', onMove, {passive: false});
     document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, {passive: false});
+    document.addEventListener('touchend', onUp);
+    document.addEventListener('touchcancel', onUp);
   }
 
   // ── Layer sidebar ────────────────────────────────────────────
