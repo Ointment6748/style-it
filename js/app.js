@@ -608,7 +608,7 @@ const AppRouter = (() => {
   // ── Init ──────────────────────────────────────────────────────
   function initThemes() {
     const toggleBtn = document.getElementById('btn-theme-toggle');
-    const brandLogo = document.getElementById('brand-logo');
+    const brandLogos = [document.getElementById('brand-logo'), document.querySelector('.mobile-top-bar-title')];
     let clickCount = 0;
     let clickTimer = null;
 
@@ -618,7 +618,7 @@ const AppRouter = (() => {
       toggleBtn.textContent = isDark ? '🌙' : '🌓';
     });
 
-    brandLogo.addEventListener('click', () => {
+    const triggerSecret = () => {
       clickCount++;
       clearTimeout(clickTimer);
       if (clickCount >= 5) {
@@ -629,6 +629,10 @@ const AppRouter = (() => {
       } else {
         clickTimer = setTimeout(() => { clickCount = 0; }, 800);
       }
+    };
+
+    brandLogos.forEach(logo => {
+      if (logo) logo.addEventListener('click', triggerSecret);
     });
   }
 
